@@ -1,0 +1,9 @@
+# Copyright (c) 2025 Ryan Jacoby
+# SPDX-License-Identifier: Apache-2.0
+#
+
+board:
+  name: hw_alpha
+  vendor: haashooligans
+  socs:
+    - name: stm32f767xx

@@ -1,0 +1,25 @@
+# Copyright (c) 2025 Ryan Jacoby
+# SPDX-License-Identifier: Apache-2.0
+#
+
+manifest:
+  remotes:
+    - name: zephyrproject-rtos
+      url-base: https://github.com/zephyrproject-rtos
+
+  projects:
+    - name: zephyr
+      remote: zephyrproject-rtos
+      revision: main
+      import:
+        name-allowlist:
+          - cmsis
+          - cmsis-dsp
+          - hal_stm32
+          - nrf_wifi
+          - picolibc
+    - name: net-tools
+      path: tools/net-tools
+
+  self:
+    path: application

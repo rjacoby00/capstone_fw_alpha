@@ -1,0 +1,7 @@
+# Copyright (c) 2025 Ryan Jacoby
+# SPDX-License-Identifier: Apache-2.0
+#
+
+menu "FW Alpha"
+source "Kconfig.zephyr"
+endmenu

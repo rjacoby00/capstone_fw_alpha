@@ -1,0 +1,16 @@
+# Copyright (c) 2025 Ryan Jacoby
+# SPDX-License-Identifier: Apache-2.0
+#
+
+if BOARD_HW_ALPHA
+
+# Ethernet config boilerplate; needs to be updated with dual Ethernet/WiFi
+# config options.
+if NETWORKING
+
+config NET_L2_ETHERNET
+	default y
+
+endif # NETWORKING
+
+endif # BOARD_HW_ALPHA
