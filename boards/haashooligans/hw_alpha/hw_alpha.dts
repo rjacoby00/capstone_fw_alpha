@@ -4,232 +4,257 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
- /dts-v1/;
- #include <st/f7/stm32f767Xi.dtsi>
- #include <st/f7/stm32f767zitx-pinctrl.dtsi>
- #include <zephyr/dt-bindings/input/input-event-codes.h>
- 
- / {
-         model = "Haas Hooligans HW Alpha Test Board";
-         compatible = "haashooligans,hw_alpha";
- 
-         chosen {
-                 zephyr,console = &usart3;
-                 zephyr,shell-uart = &usart3;
-                 zephyr,sram = &sram0;
-                 zephyr,flash = &flash0;
-                 zephyr,code-partition = &slot0_partition;
-                 zephyr,dtcm = &dtcm;
-         };
- 
-         leds: leds {
-                 compatible = "gpio-leds";
-                 red_led: led_0 {
-                         gpios = <&gpioe 13 GPIO_ACTIVE_HIGH>;
-                         label = "Heartbeat LED";
-                 };
-                 blue_led: led_1 {
-                         gpios = <&gpioe 14 GPIO_ACTIVE_HIGH>;
-                         label = "Status LED";
-                 };
-         };
- 
-         aliases {
-                 led0 = &red_led;
-                 led1 = &blue_led;
-                 watchdog0 = &iwdg;
-                 volt-sensor0 = &vref;
-                 volt-sensor1 = &vbat;
-         };
- };
- 
- &clk_lsi {
-         status = "okay";
- };
- 
- &clk_hse {
-         clock-frequency = <DT_FREQ_M(24)>;     /* External 24 MHz crystal */
-         status = "okay";
- };
- 
- &pll {
-         div-m = <16>;  /* PLL setup to make 144 MHz sysclk */
-         mul-n = <192>;
-         div-p = <2>;
-         div-q = <6>;    /* PLL-Q makes USB/SDMMCC 48 MHz clk */
-         clocks = <&clk_hse>;
-         status = "okay";
- };
- 
- &rcc {
-         clocks = <&pll>;
-         clock-frequency = <DT_FREQ_M(144)>;
-         ahb-prescaler = <1>;
-         apb1-prescaler = <4>;
-         apb2-prescaler = <2>;
- };
- 
- /* Debug header */
- &usart1 {
+/dts-v1/;
+#include <st/f7/stm32f767Xi.dtsi>
+#include <st/f7/stm32f767zitx-pinctrl.dtsi>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
+/ {
+        model = "Haas Hooligans HW Alpha Test Board";
+        compatible = "haashooligans,hw_alpha";
+
+        chosen {
+                zephyr,console = &cdc_acm_uart0;
+                zephyr,shell-uart = &cdc_acm_uart0;
+                zephyr,sram = &sram0;
+                zephyr,flash = &flash0;
+                zephyr,code-partition = &slot0_partition;
+                zephyr,dtcm = &dtcm;
+        };
+
+        leds: leds {
+                compatible = "gpio-leds";
+                red_led: led_0 {
+                        gpios = <&gpioe 13 GPIO_ACTIVE_HIGH>;
+                        label = "Heartbeat LED";
+                };
+                blue_led: led_1 {
+                        gpios = <&gpioe 14 GPIO_ACTIVE_HIGH>;
+                        label = "Status LED";
+                };
+        };
+
+        aliases {
+                led0 = &red_led;
+                led1 = &blue_led;
+                watchdog0 = &iwdg;
+                volt-sensor0 = &vref;
+                volt-sensor1 = &vbat;
+        };
+};
+
+&clk_lsi {
+        status = "okay";
+};
+
+&clk_hse {
+        clock-frequency = <DT_FREQ_M(24)>;     /* External 24 MHz crystal */
+        status = "okay";
+};
+
+&pll {
+        div-m = <16>;  /* PLL setup to make 144 MHz sysclk */
+        mul-n = <192>;
+        div-p = <2>;
+        div-q = <6>;    /* PLL-Q makes USB/SDMMCC 48 MHz clk */
+        clocks = <&clk_hse>;
+        status = "okay";
+};
+
+&rcc {
+        clocks = <&pll>;
+        clock-frequency = <DT_FREQ_M(144)>;
+        ahb-prescaler = <1>;
+        apb1-prescaler = <4>;
+        apb2-prescaler = <2>;
+};
+
+/* Debug header */
+&usart1 {
         pinctrl-0 = <&usart1_tx_pa9 &usart1_rx_pa10>;
         pinctrl-names = "default";
         current-speed = <115200>;
         status = "okay";
- };
+};
 
- /* RS-232 Port */
- &usart2 {
-         pinctrl-0 = <&usart2_tx_pd5
-                      &usart2_rx_pa3
-                      &usart2_rts_pd4
-                      &usart2_cts_pd3>;
-         pinctrl-names = "default";
-         current-speed = <115200>;
- };
- 
- /* JST Header */
- &usart3 {
-         pinctrl-0 = <&usart3_tx_pd8 
-                      &usart3_rx_pd9
-                      &usart3_rts_pd12
-                      &usart3_cts_pd11>;
-         pinctrl-names = "default";
-         current-speed = <115200>;
-         status = "okay";
- };
- 
- /*
- zephyr_udc0: &usbotg_fs {
-         pinctrl-0 = <&usb_otg_fs_dm_pa11 &usb_otg_fs_dp_pa12>;  
-         pinctrl-names = "default";
-         status = "okay";
- };
- 
- &i2c1 {
-         pinctrl-0 = <&i2c1_scl_pb8 &i2c1_sda_pb9>;
-         pinctrl-names = "default";
-         status = "okay";
-         clock-frequency = <I2C_BITRATE_FAST>;
- };
- 
- &timers1 {
-         st,prescaler = <10000>;
-         status = "okay";
- 
-         pwm1: pwm {
-                 status = "okay";
-                 pinctrl-0 = <&tim1_ch3_pe13>;
-                 pinctrl-names = "default";
-         };
- };
- 
- &spi1 {
-         pinctrl-0 = <&spi1_sck_pa5 &spi1_miso_pa6 &spi1_mosi_pa7>;
-         pinctrl-names = "default";
-         cs-gpios = <&gpiod 14 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+/* RS-232 Port J8 */
+&usart2 {
+        pinctrl-0 = <&usart2_tx_pd5
+                &usart2_rx_pa3
+                &usart2_rts_pd4
+                &usart2_cts_pd3>;
+        pinctrl-names = "default";
+        current-speed = <115200>;
+};
 
-         status = "okay";
- };
- */
+/* JST Header J11*/
+&usart3 {
+        pinctrl-0 = <&usart3_tx_pd8 
+                &usart3_rx_pd9
+                &usart3_rts_pd12
+                &usart3_cts_pd11>;
+        pinctrl-names = "default";
+        current-speed = <115200>;
+        status = "okay";
+};
 
- &iwdg {
-         status = "okay";
- };
- 
- &rtc {
-         clocks = <&rcc STM32_CLOCK_BUS_APB1 0x10000000>,
-                  <&rcc STM32_SRC_LSI RTC_SEL(2)>;
-         status = "okay";
- };
- /*
- &adc1 {
-         pinctrl-0 = <&adc1_in0_pa0>;
-         pinctrl-names = "default";
-         st,adc-clock-source = "SYNC";
-         st,adc-prescaler = <2>;
-         status = "okay";
- };
- */
- &rng {
-         status = "okay";
- };
- /*
- &mac {
-         status = "okay";
-         pinctrl-0 = <&eth_mdc_pc1
-                      &eth_rxd0_pc4
-                      &eth_rxd1_pc5
-                      &eth_ref_clk_pa1
-                      &eth_mdio_pa2
-                      &eth_crs_dv_pa7
-                      &eth_tx_en_pg11
-                      &eth_txd0_pg13
-                      &eth_txd1_pb13>;
-         pinctrl-names = "default";
-         phy-connection-type = "rmii";
- };
- */
- &flash0 {
-         partitions {
-                 compatible = "fixed-partitions";
-                 #address-cells = <1>;
-                 #size-cells = <1>;
- 
-                 /*
-                  * The two sectors 0-1 (32+32 kbytes) are reserved for
-                  * the bootloader.
-                  */
-                 boot_partition: partition@0 {
-                         label = "mcuboot";
-                         reg = <0x0 DT_SIZE_K(64)>;
-                         read-only;
-                 };
- 
-                 /*
-                  * The flash starting at offset 0x10000 and ending at
-                  * offset 0x1ffff is reserved for use by the application.
-                  * This represents sectors 2-3 (32+32 kbytes)
-                  */
-                 storage_partition: partition@10000 {
-                         label = "storage";
-                         reg = <0x00010000 DT_SIZE_K(64)>;
-                 };
- 
-                 /*
-                  * Sector 4 (128 kbytes) unallocated.
-                  */
- 
-                 /*
-                  * Allocated 3 (256k x 3) sectors for image-0. Sectors 5-7.
-                  */
-                 slot0_partition: partition@40000 {
-                         label = "image-0";
-                         reg = <0x00040000 DT_SIZE_K(768)>;
-                 };
- 
-                 /*
-                  * Allocated 3 (256k x 3) sectors for image-1. Sectors 8-10.
-                  */
-                 slot1_partition: partition@100000 {
-                         label = "image-1";
-                         reg = <0x00100000 DT_SIZE_K(768)>;
-                 };
- 
-                 /*
-                  * Allocated 1 (256k) sector for image-scratch. Sector 11.
-                  */
-                 scratch_partition: partition@1C0000 {
-                         label = "image-scratch";
-                         reg = <0x001C0000 DT_SIZE_K(256)>;
-                 };
-         };
- };
- 
- &vref {
-         status = "okay";
- };
- 
- &vbat {
-         status = "okay";
- };
- 
+/* JST Header J5 */
+&i2c1 {
+        pinctrl-0 = <&i2c1_scl_pb6 &i2c1_sda_pb7>;
+        pinctrl-names = "default";
+        status = "okay";
+        clock-frequency = <I2C_BITRATE_FAST>;
+};
+
+/* JST Header J6 */
+&i2c4 {
+        pinctrl-0 = <&i2c4_scl_pb8 &i2c4_sda_pd13>;
+        pinctrl-names = "default";
+        status = "okay";
+        clock-frequency = <I2C_BITRATE_FAST>;
+};
+
+zephyr_udc0: &usbotg_fs {
+        pinctrl-0 = <&usb_otg_fs_dm_pa11 &usb_otg_fs_dp_pa12>;  /* DP and DM are swapped on PCB */
+        pinctrl-names = "default";
+        status = "okay";
+        cdc_acm_uart0: cdc_acm_uart0 {
+                compatible = "zephyr,cdc-acm-uart";
+                label = "CDC_ACM_0";
+                status = "okay";
+        };
+};
+
+/*
+&timers1 {
+        st,prescaler = <10000>;
+        status = "okay";
+
+        pwm1: pwm {
+                status = "okay";
+                pinctrl-0 = <&tim1_ch3_pe13>;
+                pinctrl-names = "default";
+        };
+};
+
+&spi1 {
+        pinctrl-0 = <&spi1_sck_pa5 &spi1_miso_pa6 &spi1_mosi_pa7>;
+        pinctrl-names = "default";
+        cs-gpios = <&gpiod 14 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+
+        status = "okay";
+};
+*/
+
+&iwdg {
+        status = "okay";
+};
+
+&rtc {
+        clocks = <&rcc STM32_CLOCK_BUS_APB1 0x10000000>,
+                <&rcc STM32_SRC_LSI RTC_SEL(2)>;
+        status = "okay";
+};
+/*
+&adc1 {
+        pinctrl-0 = <&adc1_in0_pa0>;
+        pinctrl-names = "default";
+        st,adc-clock-source = "SYNC";
+        st,adc-prescaler = <2>;
+        status = "okay";
+};
+*/
+&rng {
+        status = "okay";
+};
+
+&mac {
+        status = "okay";
+        pinctrl-0 = <&eth_mdc_pc1
+                &eth_rxd0_pc4
+                &eth_rxd1_pc5
+                &eth_ref_clk_pa1
+                &eth_mdio_pa2
+                &eth_crs_dv_pa7
+                &eth_tx_en_pb11
+                &eth_txd0_pb12
+                &eth_txd1_pb13>;
+        pinctrl-names = "default";
+        phy-connection-type = "rmii";
+	phy-handle = <&eth_phy>;
+};
+
+&mdio {
+	status = "okay";
+	pinctrl-0 = <&eth_mdio_pa2 &eth_mdc_pc1>;
+	pinctrl-names = "default";
+
+	eth_phy: ethernet-phy@0 {
+		compatible = "ethernet-phy";
+		reg = <0x00>;
+	};
+};
+
+&flash0 {
+        partitions {
+                compatible = "fixed-partitions";
+                #address-cells = <1>;
+                #size-cells = <1>;
+
+                /*
+                * The two sectors 0-1 (32+32 kbytes) are reserved for
+                * the bootloader.
+                */
+                boot_partition: partition@0 {
+                        label = "mcuboot";
+                        reg = <0x0 DT_SIZE_K(64)>;
+                        read-only;
+                };
+
+                /*
+                * The flash starting at offset 0x10000 and ending at
+                * offset 0x1ffff is reserved for use by the application.
+                * This represents sectors 2-3 (32+32 kbytes)
+                */
+                storage_partition: partition@10000 {
+                        label = "storage";
+                        reg = <0x00010000 DT_SIZE_K(64)>;
+                };
+
+                /*
+                * Sector 4 (128 kbytes) unallocated.
+                */
+
+                /*
+                * Allocated 3 (256k x 3) sectors for image-0. Sectors 5-7.
+                */
+                slot0_partition: partition@40000 {
+                        label = "image-0";
+                        reg = <0x00040000 DT_SIZE_K(768)>;
+                };
+
+                /*
+                * Allocated 3 (256k x 3) sectors for image-1. Sectors 8-10.
+                */
+                slot1_partition: partition@100000 {
+                        label = "image-1";
+                        reg = <0x00100000 DT_SIZE_K(768)>;
+                };
+
+                /*
+                * Allocated 1 (256k) sector for image-scratch. Sector 11.
+                */
+                scratch_partition: partition@1C0000 {
+                        label = "image-scratch";
+                        reg = <0x001C0000 DT_SIZE_K(256)>;
+                };
+        };
+};
+
+&vref {
+        status = "okay";
+};
+
+&vbat {
+        status = "okay";
+};

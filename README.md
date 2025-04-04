@@ -7,7 +7,7 @@ needed custom drivers.
 
 ## Building
 
-Make sure you have Zephyr installed: 
+Make sure you have Zephyr installed:
 [Zephyr Getting Started Guide](https://docs.zephyrproject.org/latest/getting_started/index.html).
 
 Follow through the end of "Get Zephyr and install Python dependencies"
@@ -24,7 +24,7 @@ west update
 with the Zephyr SDK.
 
 `capstone_fw` will contain the Zephyr source and other required dependances;
-this project will be pulled into `capstone_fw/fw_alpha`, following the 
+this project will be pulled into `capstone_fw/fw_alpha`, following the
 [T2 topology](https://docs.zephyrproject.org/latest/develop/west/workspaces.html#west-t2).
 
 To build, run the following:
@@ -34,5 +34,8 @@ cd fw_alpha
 west build -p always -b hw_alpha app
 ```
 
-Build artifacts are placed under `build/`. Install `build/zephyr/zephyr.bin`
-using JTAG programer; automated script using `west flash` WIP.
+To upload run the following:
+
+```shell
+west flash --runner jlink
+```
